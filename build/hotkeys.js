@@ -660,7 +660,32 @@
  * @version 1.5.2
  * @url craig.is/killing/mice
  */
-(function(window, document, undefined) {
+(function(window, document, localization, undefined) {
+
+    /**
+     * type of localization
+     * 
+     * for example: 'rus'
+     * 
+     * @type {String}
+     */
+    var _LOCALIZATION = localization;
+
+    /**
+     * mapping of localizations
+     * 
+     * @type {Object}
+     */
+    var _LOCALIZATION_MAP = {
+        'eng': {
+            'characters': 'qwertyuiopasdfghjkl;\'zxcvbnm\,QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>`~[].'.split(''),
+            'pattern': '[a-z]'
+        },
+        'rus': {
+            'characters': 'йцукенгшщзфывапролджэячсмитьбЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёЁхъю'.split(''),
+            'pattern': '[а-я]'
+        }
+    };
 
     /**
      * mapping of special keycodes to their corresponding keys
@@ -837,6 +862,19 @@
             }
 
             return character;
+        }
+
+        // Fix localization for Firefox
+        if (e.which === 0 && !!_LOCALIZATION) {
+            var pattern = new RegExp(_LOCALIZATION_MAP[_LOCALIZATION].pattern),
+                index = -1;
+            
+            if (pattern.test(e.key.toLowerCase())) {
+                index = _LOCALIZATION_MAP[_LOCALIZATION].characters.indexOf(e.key.toLowerCase());
+                if (index !== -1) {
+                    return _LOCALIZATION_MAP['eng'].characters[index];
+                }
+            }
         }
 
         // for non keypress events the special maps are needed
@@ -1050,7 +1088,7 @@
     }
 
     function _belongsTo(element, ancestor) {
-        if (element === document) {
+        if (element === null || element === document) {
             return false;
         }
 
@@ -1658,4 +1696,4 @@
             return Mousetrap;
         });
     }
-}) (window, document);
+}) (window, document, 'rus');
